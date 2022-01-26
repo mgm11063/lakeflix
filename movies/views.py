@@ -5,4 +5,4 @@ from django.shortcuts import render
 def all_movies(request):
     now = datetime.now()
     hungry = True
-    return render(request, "all_movies.html", context={"now": now, "hungry": hungry})
+    return render(request, "movies/all_movies.html", context={"haha": now, "hungry": hungry})
