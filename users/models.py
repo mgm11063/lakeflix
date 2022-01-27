@@ -4,6 +4,8 @@ from django.db import models
 
 class User(AbstractUser):
     """ User Model """
+    class Meta:
+        db_table = "user"
 
     GENDER_MALE = "male"
     GENDER_FEMALE = "female"

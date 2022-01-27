@@ -1,5 +1,73 @@
-<h1>헬로우 월드</h1>
+<!-- templates/tweet/home.html -->
+{% extends 'base.html' %}
 
-<h4>지금 시간은! : {{now}</h4>
+{% block content %}
+<div class="container timeline-container">
+    <div class="row">
+        <!-- 왼쪽 컬럼 -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of
+                        the card's content.</p>
 
-<h6>{% if hungry %} 배고파요!!🙀 {% else %} 괜찮습니다😊 {% endif %}</h6>
+                </div>
+            </div>
+        </div>
+        <!-- 오른 쪽 컬럼-->
+        <div class="col-md-7">
+            <!-- 글을 작성 하는 곳 -->
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="media">
+                                <div class="media-body">
+                                    <h5 class="mt-0">나의 이야기를 적어주세요</h5>
+                                    <p>
+                                    <form>
+                                        <div class="form-group mb-2">
+                                            <textarea class="form-control" style="resize: none" name='my-content'
+                                                id="my-content"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary" style="float:right;">작성하기</button>
+                                    </form>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <!-- 작성 된 글이 나오는 곳 -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="media">
+                                <div class="media-body">
+                                    <h5 class="mt-0">Media heading</h5>
+                                    <p>Will you do the same for me? It's time to face the music I'm no longer your
+                                        muse.
+                                        Heard it's
+                                        beautiful, be the judge and my girls gonna take a vote. I can feel a phoenix
+                                        inside
+                                        of me.
+                                        Heaven is
+                                        jealous of our love, angels are crying from up above. Yeah, you take me to
+                                        utopia.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+{% endblock %}

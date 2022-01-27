@@ -1,7 +1,7 @@
 # user/views.py
 from django.shortcuts import render, redirect
 from . models import User
-from django.http import HttpResponse
+from django.contrib import auth
 
 
 def sign_up_view(request):
@@ -27,16 +27,16 @@ def sign_up_view(request):
                 return redirect("/users/signup/")
 
             else:
-                user = User()
-                user.avatar = avatar
-                user.username = username
-                user.password = password
-                user.first_name = firstname
-                user.last_name = lastname
-                user.email = email
-                user.bio = bio
-                user.gender = gender
-                user.save()
+                User.objects.create_user(
+                    avatar=avatar,
+                    username=username,
+                    password=password,
+                    first_name=firstname,
+                    last_name=lastname,
+                    email=email,
+                    bio=bio,
+                    gender=gender,
+                )
             return redirect("/users/login/")
 
 
@@ -45,9 +45,10 @@ def login_view(request):
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
 
-        get_user = User.objects.get(username=username)
-        if get_user.password == password:
-            request.session["user"] = get_user.username
+        get_user = auth.authenticate(
+            request, username=username, password=password)
+        if get_user is not None:
+            auth.login(request, get_user)
             return redirect("/")
         else:
             return redirect("/users/login/")
