@@ -19,23 +19,38 @@ def sign_up_view(request):
         bio = request.POST.get("bio", None)
 
         if password != password2:
-            return render(request, 'users/signup.html')
+            return redirect("/users/signup/")
+
         else:
-            user = User()
-            user.avatar = avatar
-            user.username = username
-            user.password = password
-            user.first_name = firstname
-            user.last_name = lastname
-            user.email = email
-            user.bio = bio
-            user.gender = gender
-            user.save()
-        return redirect("/users/login/")
+            exist_user = User.objects.filter(username=username)
+            if exist_user:
+                return redirect("/users/signup/")
+
+            else:
+                user = User()
+                user.avatar = avatar
+                user.username = username
+                user.password = password
+                user.first_name = firstname
+                user.last_name = lastname
+                user.email = email
+                user.bio = bio
+                user.gender = gender
+                user.save()
+            return redirect("/users/login/")
 
 
 def login_view(request):
     if request.method == 'POST':
-        return HttpResponse("로그인 성공 ")
+        username = request.POST.get("username", None)
+        password = request.POST.get("password", None)
+
+        get_user = User.objects.get(username=username)
+        if get_user.password == password:
+            request.session["user"] = get_user.username
+            return redirect("/")
+        else:
+            return redirect("/users/login/")
+
     elif request.method == 'GET':
         return render(request, 'users/login.html')
