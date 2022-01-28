@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+무비 디테일 페이지입니다.
+{% endblock page_title %}
+
+{% block content %}
+<h4>{{movie.title_kor}}</h4>
+<p>{{movie.synopsis}}</p>
+<img src="{{movie.poster}}" alt="1">
+
+
+
+{% endblock content %}
