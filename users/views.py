@@ -1,7 +1,8 @@
-# user/views.py
-from django.shortcuts import render, redirect
 from . models import User
 from django.contrib import auth
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.contrib.auth import logout
 
 
 def sign_up_view(request):
@@ -19,12 +20,12 @@ def sign_up_view(request):
         bio = request.POST.get("bio", None)
 
         if password != password2:
-            return redirect("/users/signup/")
+            return redirect(reverse("users:signup"))
 
         else:
             exist_user = User.objects.filter(username=username)
             if exist_user:
-                return redirect("/users/signup/")
+                return redirect(reverse("users:signup"))
 
             else:
                 User.objects.create_user(
@@ -37,7 +38,7 @@ def sign_up_view(request):
                     bio=bio,
                     gender=gender,
                 )
-            return redirect("/users/login/")
+            return redirect(reverse("users:login"))
 
 
 def login_view(request):
@@ -51,7 +52,11 @@ def login_view(request):
             auth.login(request, get_user)
             return redirect("/")
         else:
-            return redirect("/users/login/")
-
+            return redirect(reverse("users:login"))
     elif request.method == 'GET':
         return render(request, 'users/login.html')
+
+
+def log_out(request):
+    logout(request)
+    return redirect(reverse("core:home"))

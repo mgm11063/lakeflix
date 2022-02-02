@@ -5,20 +5,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css" />
     <title>{% block page_title %}{% endblock page_title %} | Lakeflix</title>
 </head>
 
 <body class="text-gray-800 mt-24 font-light">
-    <header>
-        <div>
-            <a href="#">
-                asdfadsf
-                <img src="#" />
-            </a>
-        </div>
-    </header>
-    {% block content %}{% endblock %}
+    {% if user.is_authenticated %}
+    {% include "partials/nav.html" %}
+    {% else %}
+    {% endif %}
+    {% block content %}
+    {% endblock %}
     {% include "partials/footer.html" %}
 </body>
 

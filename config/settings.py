@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# 일반적인 상황일때는 DEBUG=True 로 해주세요 지금은 404 테스트 때문에 바꿔놓았습니다!
+# ALLOWED_HOSTS 도 일반 상황일때는  ALLOWED_HOSTS = [] 로 해주세요! 마찬가지 이유입니다.
 
 # Application definition
 

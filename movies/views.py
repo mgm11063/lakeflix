@@ -1,9 +1,10 @@
 import csv
-import datetime
-from django.shortcuts import redirect, render
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from . import models
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.http import Http404
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 
 
 @login_required(login_url="/users/login/")
@@ -13,7 +14,7 @@ def home_page(request):
     if user:
         return render(request, "movies/all_movies.html", context={"movies": all_movies})
     else:
-        return redirect("/users/login/")
+        return redirect(reverse("users:login"))
 
 # @login_required(login_url="/users/login/") =  로그인 안했으면 로그인페이지로 돌리기
 
@@ -24,13 +25,17 @@ def test(request):
     if user:
         return render(request, "movies/subpagetest.html")
     else:
-        return redirect("/users/login/")
+        return redirect(reverse("users:login"))
 
 
 @login_required(login_url="/users/login/")
 def movie_detail(request, pk):
-    movie = models.Movies.objects.get(pk=pk)
-    return render(request, "movies/detail.html", context={"movie": movie})
+    try:
+        movie = models.Movies.objects.get(pk=pk)
+        return render(request, "movies/detail.html", context={"movie": movie})
+
+    except models.Movies.DoesNotExist:
+        raise Http404()
 
 
 def csv_test(request):
@@ -41,6 +46,7 @@ def csv_test(request):
         for row in data_reader:
 
             genre_data = row['genre_list']
+            # genre_data_list 수정 필요 너무 replace 불필요하게 많이 사용함
             genre_data_list = genre_data.replace("[", "").replace(
                 "]", "").replace(" ", "").replace("'", "").split(",")
 
