@@ -3,7 +3,7 @@
 로그인 페이지 입니당
 {% endblock page_title %}
 {% block content %}
-<div>
+<!-- <div>
     <h2>로그인</h2>
     <form class="form-area" method="post" action="{% url 'users:login' %}">
         {% csrf_token %}
@@ -21,5 +21,16 @@
             <a href="{% url 'users:signup' %}" class="btn btn-secondary">회원가입 페이지로</a>
         </div>
     </form>
+</div> -->
+<!-- 폼테스트중 -->
+
+<div>
+    <h2>로그인</h2>
+    <form class="form-area" method="post" action="{% url 'users:login' %}">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit">로그인</button>
+    </form>
 </div>
+
 {% endblock content %}

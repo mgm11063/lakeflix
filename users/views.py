@@ -1,4 +1,5 @@
 from . models import User
+from . import forms
 from django.contrib import auth
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -42,19 +43,22 @@ def sign_up_view(request):
 
 
 def login_view(request):
+    form = forms.LoginForm()
     if request.method == 'POST':
+        form = forms.LoginForm(request.POST)
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
-
         get_user = auth.authenticate(
             request, username=username, password=password)
         if get_user is not None:
             auth.login(request, get_user)
             return redirect("/")
         else:
-            return redirect(reverse("users:login"))
+            return render(request, 'users/login.html', {"form": form})
+            # return redirect(reverse("users:login"))
     elif request.method == 'GET':
-        return render(request, 'users/login.html')
+        form = forms.LoginForm()
+        return render(request, 'users/login.html', {"form": form})
 
 
 def log_out(request):
