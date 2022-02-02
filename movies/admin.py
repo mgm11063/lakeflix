@@ -10,4 +10,4 @@ class ItemAdmin(admin.ModelAdmin):
 @admin.register(models.Movies)
 class moviesAdmin(admin.ModelAdmin):
     """ Custom User Admin """
-    list_display = ("__str__", "title_kor")
+    list_display = ("id", "title_kor")

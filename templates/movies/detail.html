@@ -8,7 +8,11 @@
 <h4>{{movie.title_kor}}</h4>
 <p>{{movie.synopsis}}</p>
 <img src="{{movie.poster}}" alt="1">
-
+<ul>
+    {% for tag in movie.genre_list.all %}
+    <li>{{tag}}</li>
+    {% endfor %}
+</ul>
 
 
 {% endblock content %}

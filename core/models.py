@@ -3,8 +3,8 @@ from django.db import models
 
 class TimeStampedModel(models.Model):
     """타임 히스토리 역활"""
-    created = models.DateTimeField()
-    updated = models.DateTimeField()
+    created = models.DateTimeField(null=True)
+    updated = models.DateTimeField(null=True)
 
     class Meta:
         abstract = True
