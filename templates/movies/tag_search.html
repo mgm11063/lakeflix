@@ -1,0 +1,97 @@
+<!-- templates/movies/tag_search.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="finder-desktop" style="display: flex;width: 100%;height: 100%">
+        <!-- 왼쪽 컬럼 : 태그 필터 -->
+        <div class="sidebar-wrapper" style="border-right: 5px solid black;left: 0">
+            <div class="filter">
+                <h2 class="filter-title">Filter</h2>
+                <h4 class="filter-sub-title">Movie Type</h4>
+                <div class="filter-checkbox" style="display: flex;flex-direction: column">
+                    <form method="post" action="/movies/api/finder/" accept-charset="UTF-8" onsubmit="document.charset='UTF-8';">
+                        {% csrf_token %}
+                        <fieldset>
+                            <legend>sub title 1</legend>
+                            <div>
+                                <input type="checkbox" id="로맨스" name="tag" value="로맨스,1" onchange="this.form.submit()">
+                                <label for="로맨스">로맨스</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="스포츠" name="tag" value="스포츠,1" onchange="this.form.submit()">
+                                <label for="스포츠">스포츠</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="역사" name="tag" value="역사,1" onchange="this.form.submit()">
+                                <label for="역사">역사</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="서부" name="tag" value="서부,1" onchange="this.form.submit()">
+                                <label for="서부">서부</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="음악" name="tag" value="음악,1" onchange="this.form.submit()">
+                                <label for="음악">음악</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="공포" name="tag" value="공포,1" onchange="this.form.submit()">
+                                <label for="공포">공포</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="판타지" name="tag" value="판타지,1" onchange="this.form.submit()">
+                                <label for="판타지">판타지</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="가족" name="tag" value="가족,1" onchange="this.form.submit()">
+                                <label for="가족">가족</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="범죄" name="tag" value="범죄,1" onchange="this.form.submit()">
+                                <label for="범죄">범죄</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="애니메이션" name="tag" value="애니메이션,1" onchange="this.form.submit()">
+                                <label for="애니메이션">애니메이션</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="SF" name="tag" value="SF,1" onchange="this.form.submit()">
+                                <label for="SF">SF</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="스릴러" name="tag" value="스릴러,1" onchange="this.form.submit()">
+                                <label for="스릴러">스릴러</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="코미디" name="tag" value="코미디,1" onchange="this.form.submit()">
+                                <label for="코미디">코미디</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="액션" name="tag" value="액션,1" onchange="this.form.submit()">
+                                <label for="액션">액션</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="드라마" name="tag" value="드라마,1" onchange="this.form.submit()">
+                                <label for="드라마">드라마</label>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- 오른쪽 컬럼 : 필터링 된 영화 -->
+        <div class="main-contents">
+            <div class="media-body">
+                <h2 class="mt-0">Movies</h2>
+                <p>
+                    {% for movie in movies %}
+                        <h4>{{ movie.title_kor }} :
+                            <a href="/movies/{{ movie.pk }}">
+                                아이디 {{ movie.pk }} 로 가는 링크
+                            </a>
+                        </h4>
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

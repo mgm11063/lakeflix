@@ -8,4 +8,5 @@ urlpatterns = [
     path("<int:pk>", views.movie_detail, name="detail"),
     path("csv_test", views.csv_test, name="csv_test"),
     #path("search/", views.search_view, name="search"),
+    path('api/finder/', views.tag_search, name="tag_search"),
 ]

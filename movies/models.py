@@ -35,7 +35,7 @@ class Movies(models.Model):
     poster = models.CharField(max_length=100)
     genre_list = models.ManyToManyField(
         MovieType)
-    # blank=True 는 빈 채로 저장되는 것을 허용합니다.
+    # blank=True 는 빈 채로 저장되는 것을 허용합니다. ㅡ
 
     def __str__(self):
         return self.title_kor  # admin 페이지에서 각 무비들 이름 주기 (필수 아님)

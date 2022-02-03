@@ -1,6 +1,9 @@
 <header>
     <a href="{% url "core:home" %}">LAKEFLIX</a>
     <ul>
+        <li><a class="nav-link" href="{% url 'movies:tag_search' %}">태그검색</a></li>
+        <li><a class="nav-link" href="{% url 'movies:tag_search' %}">NEW/TREND</a></li>
         <li><a href="{% url "users:logout" %}">로그아웃</a></li>
     </ul>
+
 </header>

@@ -38,8 +38,28 @@ def movie_detail(request, pk):
         raise Http404()
 
 
+def tag_search(request):
+    all_movies = models.Movies.objects.all()
+    if request.method == 'GET':
+        return render(request, 'movies/tag_search.html', context={"movies": all_movies})
+    elif request.method == 'POST':
+        checked_tag, check_cnt = request.POST.get('tag', '').split(',') # 체크한 태그, 해당 태그를 체킹한 카운트 수
+        print("checked_tag =",checked_tag, "/ check_cnt =",check_cnt)
+        if int(check_cnt) == 1: # 르탄이 그림 바뀌는 거 참고하면 좋을듯.
+            # 체크된 태그들만 보여줘. = objects.filter() -> 괄호 안의 값으로 필터링 해 불러옴
+            filtered_movies = models.Movies.objects.filter(genre_list__name=checked_tag)
+        elif int(check_cnt) == 2:
+            # 체크된 태그들만 빼고 보여줘 = objects.exclude() 사용 -> 괄호 안의 값을 제외하고 불러옴
+            filtered_movies = models.Movies.objects.exclude(genre_list__name=checked_tag)
+        else: # 해당 태그를 체킹한 카운트가 3이 되는 순간 카운트를 0으로 초기화 시켜줘야 함.
+            # 전부 다 보여줘 = all_movies
+            filtered_movies = all_movies
+
+        return render(request, 'movies/tag_search.html', context={'movies': filtered_movies})
+
+
 def csv_test(request):
-    CSV_PATH = "/Users/mungyeongmin/lakeflix/JustWatch_dataset.csv"
+    CSV_PATH = "/JustWatch_dataset.csv"
     with open(CSV_PATH, newline='') as csvfile:
         data_reader = csv.DictReader(csvfile)
 
