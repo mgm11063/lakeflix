@@ -2,86 +2,211 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+    <script type="text/javascript">
+        // window.onload로 화면이 모두 로드되고 난 후 진행되도록 함.
+
+        // 1. 해당 id, class 속성을 가진 엘리먼트를 가져와 전체에 이벤트 붙이기.
+        // 박스, 장르명 어느것을 클릭해도 클릭 되도록.
+        // 반복을 줄일 수 있고, html 태그가 깔끔해지며, 관리가 쉬워짐.
+        // return이 배열값으로 반복문을 돌려 전체 엘리먼트에 이벤트를 붙임.
+        window.onload = function () {
+            let lis = document.querySelectorAll("#genre-box .check-label");
+            // console.log(lis)
+            lis.forEach(function (el) {
+                el.addEventListener("click", check_label_click, false)
+            })
+        }
+
+        /*
+        // 2. 해당 id 속성을 가진 엘리먼트를 가져와 이벤트를 붙이기.
+        window.onload=function (){
+            let element = document.getElementById("genre-box");
+            console.log(element) // 1개만 검색됨.
+            element.addEventListener("click", check_label_click)
+        }
+        */
+
+        /*
+        // 3. 해당 class 속성을 가진 엘리먼트를 가져와 이벤트를 붙임.
+        window.onload=function (){
+            // return이 배열값으로 반복문을 돌려 전체 엘리먼트에 이벤트를 붙임.
+            let element = document.getElementsByClassName("check-label")
+            // console.log(element)
+            for(let i=0; i<element.length; i++){
+                element[i].addEventListener("click", check_label_click, false)
+            }
+        }
+        */
+
+        // 클릭시 실행되는 함수의 인수로 event를 넣어준다.
+        // 해당 인수로 이벤트의 대상 요소를 알 수 있게 해준다.
+        function check_label_click(e) {
+            // event.target : 현재 이벤트가 발생한 요소의 속성을 얻을 수 있음.
+            // event.target과 this는 DOM 객체이고, jQuery 객체가 아니기 때문에 jQuery 메소드를 사용할 수 없다.
+            // 그렇다면 어떻게 jQuery 객체로 요소를 받을 수 있을까? $(event.target) 또는 $(this)와 같은 작업을 해주면 된다.
+            // console.log(e.currentTarget)
+            // console.log($(this))
+
+            // 클래스 속성 값에 negative가 포함되어 있으면 해당 요소를 숨기고, 전전 요소를 보여줌.
+            if ($(e.currentTarget).attr('class').includes("negative")) {
+                $(e.currentTarget).hide()
+                $(e.currentTarget.previousElementSibling.previousElementSibling).show()
+            }
+            // 아니면, 해당 요소를 숨기고, 다음 요소를 보여줌.
+            else {
+                $(e.currentTarget).hide()
+                $(e.currentTarget.nextElementSibling).show()
+            }
+
+            // 1. 클릭한 요소의 넘겨줄 movie_type을 정의함.(드라마, 액션, 등등)
+            let element = e.currentTarget
+            let span = element.querySelector('span')
+            let movie_type = span.innerText
+            console.log(movie_type)
+
+            // 2. 클릭한 요소의 클래스 속성 값을 보여줌.(check-label common 같은)
+            // console.log($(e.currentTarget).attr('class'))
+            // 클릭한 요소의 다음 요소 클래스 속성 값
+            let next_class_attr = $(e.currentTarget.nextElementSibling).attr('class')
+            // 다음 요소의 클래스 속성 값이 undefined일 경우 전전 클래스 속성 값으로 되돌아감. 예외처리.
+            if (next_class_attr === undefined) {
+                next_class_attr = $(e.currentTarget.previousElementSibling.previousElementSibling).attr('class')
+            }
+            console.log(next_class_attr)
+
+            // 3. 클릭한 요소의 다음 요소 속성 값에 포함된 string에 따라 넘겨줄 필터 상태값을 정의함.
+            let filter_attr = ""
+            if (next_class_attr.includes("active")) {
+                filter_attr = "filter"
+            } else if (next_class_attr.includes("negative")) {
+                filter_attr = "exclude"
+            } else if (next_class_attr.includes("common")) {
+                filter_attr = "uncheck"
+            }
+            console.log(filter_attr)
+
+            // 예를들어, 클래스 common에서 클릭시, 클래스 active로 바뀌면서, 클래스 active 속성 값이 넘어가야 함.
+            // 4. 클릭한 시점의 해당 요소의 movie_type과 다음 클래스 속성 값에 따라 정의한 값을 넘겨주면 될 것이다.
+            $.ajax({
+                type: "POST",
+                url: "{% url 'movies:tag_search' %}",
+                data: {'movie_type': movie_type, 'filter_attr': filter_attr, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                dataType: "json",
+
+                // 5. 잘 받아졌으면, 받아진 내용으로 작업.
+                success: function (response) {
+                    // alert("성공!")
+                    console.log(typeof (response), response)
+                    console.log(response['movies'])
+
+                    $('#media-count').empty()
+                    $('#media-body').empty()
+
+                    let rows = response['movies']
+                    console.log(rows.length)
+                    let temp_count = `<h4 class="media-count">총 ${rows.length}개의 작품이 검색되었어요!</h4>`
+                    $('#media-count').append(temp_count)
+                    for(let i=0; i<rows.length; i++) {
+                        let title_kor = rows[i]['title_kor']
+                        let pk = rows[i]['id']
+                        // console.log(title_kor, pk)
+                        let temp_html = `<p class="media-body">
+                                            <h4>${title_kor} :
+                                                <a href="/movies/${pk}">
+                                                    아이디 ${pk} 로 가는 링크
+                                                </a>
+                                            </h4>
+                                        </p>`
+
+                        $('#media-body').append(temp_html)
+                    }
+                },
+                error: function (request, status, error) {
+                    console.log(request, status, error)
+                }
+            })
+
+
+            /*
+            if($('.common').css('display') !== 'none'){
+                console.log(e.currentTarget)
+                $(e.currentTarget).hide()
+                //$(this).hide()
+                // console.log($(e.currentTarget.nextElementSibling))
+                // 선택한 노드와 같은 레벨에 있는 다음(선택한 노드의 바로 밑) 형제 노드의 요소를 보여줌.
+                $(e.currentTarget.nextElementSibling).show()
+            }
+            else if($('.active').css('display') !== 'none'){
+                console.log(e.currentTarget)
+                $(this).hide()
+                $(e.currentTarget.nextElementSibling).show()
+            }
+            else if($('.negative').css('display') !== 'none'){
+                console.log(e.currentTarget)
+                $(this).hide()
+                // 선택한 노드와 같은 레벨에 있는 이전(선택한 노드의 바로 위) 형제 노드의 요소를 보여줌.
+                $(e.currentTarget.previousElementSibling.previousElementSibling).show()
+            }
+            */
+        }
+    </script>
+
     <div class="finder-desktop" style="display: flex;width: 100%;height: 100%">
         <!-- 왼쪽 컬럼 : 태그 필터 -->
         <div class="sidebar-wrapper" style="border-right: 5px solid black;left: 0">
             <div class="filter">
                 <h2 class="filter-title">Filter</h2>
                 <h4 class="filter-sub-title">Movie Type</h4>
-                <div class="filter-checkbox" style="display: flex;flex-direction: column">
-                    <form method="post" action="/movies/api/finder/" accept-charset="UTF-8" onsubmit="document.charset='UTF-8';">
-                        {% csrf_token %}
-                        <fieldset>
-                            <legend>sub title 1</legend>
-                            <div>
-                                <input type="checkbox" id="로맨스" name="tag" value="로맨스,1" onchange="this.form.submit()">
-                                <label for="로맨스">로맨스</label>
+                <div class="filter-checkbox-body">
+                    <fieldset>
+                        <legend>sub title 1</legend>
+                        {% for genre in genres %}
+                            <div id="genre-box" class="genre-box">
+                                <div class="check-label common" style="display: flex">
+                                    <svg fill="currentColor" preserveAspectRatio="xMidYMid meet" height="1em"
+                                         width="1em" viewBox="0 0 16 16" style="vertical-align:middle">
+                                        <path fill="#FFF" fill-rule="evenodd" stroke="currentColor"
+                                              d="M2 .5A1.5 1.5 0 0 0 .5 2v12A1.5 1.5 0 0 0 2 15.5h12a1.5 1.5 0 0 0 1.5-1.5V2A1.5 1.5 0 0 0 14 .5H2z"></path>
+                                    </svg>
+                                    <span class="text" style="margin-left: 5px">{{ genre.name }}</span>
+                                </div>
+                                <div class="check-label active" style="display: none">
+                                    <svg fill="currentColor" preserveAspectRatio="xMidYMid meet" height="1em"
+                                         width="1em" viewBox="0 0 16 16" style="vertical-align:middle">
+                                        <g fill="none" fill-rule="evenodd">
+                                            <rect width="15" height="15" x=".5" y=".5" fill="#FFF" stroke="currentColor"
+                                                  rx="2"></rect>
+                                            <path fill="currentColor" fill-rule="nonzero"
+                                                  d="M6.335 11.807V12c-.23 0-.44-.088-.495-.222L3.18 8.75c-.266-.277-.226-.697.049-.984.273-.285.698-.24.986.059l2.123 2.453 5.48-6.062a.665.665 0 0 1 .98 0 .7.7 0 0 1 .005.98l-5.929 6.59a.745.745 0 0 1-.54.215v-.193z"></path>
+                                        </g>
+                                    </svg>
+                                    <span class="text" style="margin-left: 5px">{{ genre.name }}</span>
+                                </div>
+                                <div class="check-label negative" style="display: none">
+                                    <svg fill="currentColor" preserveAspectRatio="xMidYMid meet" height="1em"
+                                         width="1em" viewBox="0 0 16 16" style="vertical-align:middle">
+                                        <g fill="none" fill-rule="evenodd">
+                                            <rect width="15" height="15" x=".5" y=".5" fill="#FFF" stroke="currentColor"
+                                                  rx="2"></rect>
+                                            <rect width="10" height="1.6" x="3" y="7" fill="currentColor"
+                                                  rx=".8"></rect>
+                                        </g>
+                                    </svg>
+                                    <span class="text" style="margin-left: 5px">{{ genre.name }}</span>
+                                </div>
                             </div>
-                            <div>
-                                <input type="checkbox" id="스포츠" name="tag" value="스포츠,1" onchange="this.form.submit()">
-                                <label for="스포츠">스포츠</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="역사" name="tag" value="역사,1" onchange="this.form.submit()">
-                                <label for="역사">역사</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="서부" name="tag" value="서부,1" onchange="this.form.submit()">
-                                <label for="서부">서부</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="음악" name="tag" value="음악,1" onchange="this.form.submit()">
-                                <label for="음악">음악</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="공포" name="tag" value="공포,1" onchange="this.form.submit()">
-                                <label for="공포">공포</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="판타지" name="tag" value="판타지,1" onchange="this.form.submit()">
-                                <label for="판타지">판타지</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="가족" name="tag" value="가족,1" onchange="this.form.submit()">
-                                <label for="가족">가족</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="범죄" name="tag" value="범죄,1" onchange="this.form.submit()">
-                                <label for="범죄">범죄</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="애니메이션" name="tag" value="애니메이션,1" onchange="this.form.submit()">
-                                <label for="애니메이션">애니메이션</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="SF" name="tag" value="SF,1" onchange="this.form.submit()">
-                                <label for="SF">SF</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="스릴러" name="tag" value="스릴러,1" onchange="this.form.submit()">
-                                <label for="스릴러">스릴러</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="코미디" name="tag" value="코미디,1" onchange="this.form.submit()">
-                                <label for="코미디">코미디</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="액션" name="tag" value="액션,1" onchange="this.form.submit()">
-                                <label for="액션">액션</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="드라마" name="tag" value="드라마,1" onchange="this.form.submit()">
-                                <label for="드라마">드라마</label>
-                            </div>
-                        </fieldset>
-                    </form>
+                            <p></p>
+                        {% endfor %}
+                    </fieldset>
                 </div>
             </div>
         </div>
-        <!-- 오른쪽 컬럼 : 필터링 된 영화 -->
-        <div class="main-contents">
-            <div class="media-body">
-                <h2 class="mt-0">Movies</h2>
+        <!-- 오른쪽 컬럼 : 필터링 된 영상들 -->
+        <div id="main-contents">
+            <h2 id="media-title">Movies</h2>
+            <h4 id="media-count">총 {{ mov_cnt }}개의 작품이 검색되었어요!</h4>
+            <div id="media-body">
                 <p>
                     {% for movie in movies %}
                         <h4>{{ movie.title_kor }} :

@@ -1,4 +1,6 @@
 import csv
+import json
+
 from . import models
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -40,22 +42,30 @@ def movie_detail(request, pk):
 
 def tag_search(request):
     all_movies = models.Movies.objects.all()
+    all_genres = models.MovieType.objects.all()
+    mov_cnt = len(all_movies)
     if request.method == 'GET':
-        return render(request, 'movies/tag_search.html', context={"movies": all_movies})
+        return render(request, 'movies/tag_search.html', context={'movies': all_movies, "genres": all_genres, "mov_cnt": mov_cnt})
     elif request.method == 'POST':
-        checked_tag, check_cnt = request.POST.get('tag', '').split(',') # 체크한 태그, 해당 태그를 체킹한 카운트 수
-        print("checked_tag =",checked_tag, "/ check_cnt =",check_cnt)
-        if int(check_cnt) == 1: # 르탄이 그림 바뀌는 거 참고하면 좋을듯.
+        checked_movie_type = request.POST.get('movie_type', '') # 체크한 영상의 타입
+        filter_attr = request.POST.get('filter_attr', '') # 체크한 영상을 필터링 or 제외할 것인지 값
+        print('checked_movie_type =',checked_movie_type, '/ filter_attr =',filter_attr)
+        if filter_attr == 'filter':
             # 체크된 태그들만 보여줘. = objects.filter() -> 괄호 안의 값으로 필터링 해 불러옴
-            filtered_movies = models.Movies.objects.filter(genre_list__name=checked_tag)
-        elif int(check_cnt) == 2:
+            filtered_movies = models.Movies.objects.filter(genre_list__name=checked_movie_type)
+        elif filter_attr == 'exclude':
             # 체크된 태그들만 빼고 보여줘 = objects.exclude() 사용 -> 괄호 안의 값을 제외하고 불러옴
-            filtered_movies = models.Movies.objects.exclude(genre_list__name=checked_tag)
+            filtered_movies = models.Movies.objects.exclude(genre_list__name=checked_movie_type)
         else: # 해당 태그를 체킹한 카운트가 3이 되는 순간 카운트를 0으로 초기화 시켜줘야 함.
             # 전부 다 보여줘 = all_movies
             filtered_movies = all_movies
 
-        return render(request, 'movies/tag_search.html', context={'movies': filtered_movies})
+        # QuerySet 타입을 json으로 넘길 수 있도록 안의 값을 빼서 리스트화.
+        context = {'movies': list(filtered_movies.values())}
+        print(type(context), context)
+
+        return HttpResponse(json.dumps(context), content_type='application/json')
+        # return render(request, 'movies/tag_search.html', context={'movies': filtered_movies, "genres": all_genres})
 
 
 def csv_test(request):
